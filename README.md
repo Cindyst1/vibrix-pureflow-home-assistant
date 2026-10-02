@@ -49,7 +49,14 @@ Bewaar `devices.json`, `tinytuya.json` en `tuya-raw.json` niet in Git: ze bevatt
 
 ### HACS custom repository
 
-Zodra deze map in een GitHub-repository staat, voeg je de repository-URL in HACS toe als type **Integration**. Daarna verschijnt **Vibrix PureFlow** onder de downloadbare integraties.
+1. Open **HACS** in de zijbalk van Home Assistant.
+2. Open rechtsboven het menu met de drie puntjes en kies **Custom repositories**.
+3. Voeg `https://github.com/Cindyst1/vibrix-pureflow-home-assistant` toe
+   als type **Integration**.
+4. Open **Vibrix PureFlow** in HACS en kies **Download**.
+5. Herstart Home Assistant.
+6. Ga naar **Instellingen → Apparaten & diensten → Integratie toevoegen** en
+   zoek naar **Vibrix PureFlow**.
 
 ## Datapoints bepalen
 
