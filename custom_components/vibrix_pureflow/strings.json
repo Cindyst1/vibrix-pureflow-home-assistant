@@ -1,0 +1,104 @@
+{
+  "title": "Vibrix PureFlow",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect locally to your PureFlow15",
+        "description": "This integration communicates directly over your local network. Fully close the Tuya Smart app before testing; the device may only accept one connection at a time.",
+        "data": {
+          "name": "Name",
+          "host": "IP address",
+          "device_id": "Tuya device ID",
+          "local_key": "Local key",
+          "protocol_version": "Protocol version",
+          "scan_interval": "Polling interval (seconds)"
+        },
+        "data_description": {
+          "host": "Preferably reserve a fixed DHCP address for the device.",
+          "local_key": "The local key is exactly 16 characters.",
+          "protocol_version": "The network scan usually reports the correct 3.x version."
+        }
+      },
+      "reconfigure": {
+        "title": "Reconfigure PureFlow15",
+        "description": "Update the local connection. Leave the local key empty to retain the stored key. You can then remap all datapoints as well.",
+        "data": {
+          "host": "IP address",
+          "device_id": "Tuya device ID",
+          "local_key": "Local key",
+          "protocol_version": "Protocol version",
+          "scan_interval": "Polling interval (seconds)"
+        }
+      },
+      "mapping": {
+        "title": "Map the datapoints",
+        "description": "The device reports these local values:\n\n{detected_dps}\n\nOnly select features whose datapoint you know. Use the DP probe described in the documentation to compare changes.",
+        "data": {
+          "power_dp": "Power DP",
+          "speed_dp": "Fan speed DP",
+          "speed_values": "Speed values, low to high",
+          "mode_dp": "Mode DP",
+          "manual_mode_value": "Manual mode value",
+          "auto_mode_value": "Automatic mode value",
+          "sleep_mode_value": "Sleep mode value",
+          "pm25_dp": "PM2.5 DP",
+          "voc_dp": "VOC DP",
+          "air_quality_dp": "Air quality DP",
+          "filter_life_dp": "Filter life DP",
+          "filter_reset_dp": "Filter reset DP",
+          "ionizer_dp": "Ionizer DP",
+          "child_lock_dp": "Child lock DP",
+          "display_dp": "Display DP",
+          "countdown_dp": "Countdown DP",
+          "countdown_values": "Countdown values"
+        },
+        "data_description": {
+          "speed_values": "Comma-separated, ordered from low to high. The PureFlow15 Pro uses low, mid, high, turbo.",
+          "countdown_values": "Comma-separated. The PureFlow15 Pro uses cancel, 1h, 2h, 3h, 4h, 5h."
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Cannot reach the device locally. Check its IP address, key and protocol version, and close the app.",
+      "power_not_boolean": "The power datapoint must be a boolean (true/false).",
+      "speed_values_invalid": "Enter at least two speed values, ordered from low to high.",
+      "countdown_values_invalid": "Enter at least two countdown values.",
+      "switch_not_boolean": "This datapoint must be a boolean (true/false).",
+      "invalid_local_key": "The local key must be exactly 16 characters.",
+      "unknown": "Unexpected error. Check the Home Assistant logs."
+    },
+    "abort": {
+      "already_configured": "This device is already configured. Its IP address was updated.",
+      "reconfigure_successful": "The local connection and datapoint mappings were updated."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "pm25": {"name": "PM2.5"},
+      "voc": {"name": "VOC"},
+      "air_quality": {"name": "Air quality"},
+      "filter_life": {"name": "Filter life"}
+    },
+    "switch": {
+      "ionizer": {"name": "Ionizer"},
+      "child_lock": {"name": "Child lock"},
+      "display": {"name": "Display"}
+    },
+    "button": {
+      "filter_reset": {"name": "Reset filter life"}
+    },
+    "select": {
+      "countdown": {
+        "name": "Off timer",
+        "state": {
+          "cancel": "Off",
+          "1h": "1 hour",
+          "2h": "2 hours",
+          "3h": "3 hours",
+          "4h": "4 hours",
+          "5h": "5 hours"
+        }
+      }
+    }
+  }
+}

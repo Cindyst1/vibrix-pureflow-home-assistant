@@ -1,0 +1,104 @@
+{
+  "title": "Vibrix PureFlow",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Verbind lokaal met je PureFlow15",
+        "description": "De integratie communiceert rechtstreeks via je lokale netwerk. Sluit de Tuya Smart-app volledig af voordat je test; het apparaat accepteert soms maar één verbinding tegelijk.",
+        "data": {
+          "name": "Naam",
+          "host": "IP-adres",
+          "device_id": "Tuya device-ID",
+          "local_key": "Lokale sleutel",
+          "protocol_version": "Protocolversie",
+          "scan_interval": "Verversingsinterval (seconden)"
+        },
+        "data_description": {
+          "host": "Geef het apparaat bij voorkeur een vast DHCP-adres.",
+          "local_key": "De lokale sleutel bestaat uit precies 16 tekens.",
+          "protocol_version": "De netwerkscan toont meestal de juiste 3.x-versie."
+        }
+      },
+      "reconfigure": {
+        "title": "PureFlow15 opnieuw configureren",
+        "description": "Werk de lokale verbinding bij. Laat de lokale sleutel leeg om de opgeslagen sleutel te behouden. Daarna kun je ook alle datapointkoppelingen opnieuw instellen.",
+        "data": {
+          "host": "IP-adres",
+          "device_id": "Tuya device-ID",
+          "local_key": "Lokale sleutel",
+          "protocol_version": "Protocolversie",
+          "scan_interval": "Verversingsinterval (seconden)"
+        }
+      },
+      "mapping": {
+        "title": "Koppel de datapoints",
+        "description": "Het apparaat rapporteert de volgende lokale waarden:\n\n{detected_dps}\n\nSelecteer alleen functies waarvan je het datapoint zeker weet. Gebruik de DP-probe uit de documentatie om wijzigingen te vergelijken.",
+        "data": {
+          "power_dp": "Aan/uit-DP",
+          "speed_dp": "Ventilatorsnelheid-DP",
+          "speed_values": "Snelheidswaarden, laag naar hoog",
+          "mode_dp": "Modus-DP",
+          "manual_mode_value": "Waarde voor handmatige modus",
+          "auto_mode_value": "Waarde voor automatische modus",
+          "sleep_mode_value": "Waarde voor slaapmodus",
+          "pm25_dp": "PM2.5-DP",
+          "voc_dp": "VOC-DP",
+          "air_quality_dp": "Luchtkwaliteits-DP",
+          "filter_life_dp": "Filterlevensduur-DP",
+          "filter_reset_dp": "Filterreset-DP",
+          "ionizer_dp": "Ionisator-DP",
+          "child_lock_dp": "Kinderslot-DP",
+          "display_dp": "Display-DP",
+          "countdown_dp": "Uitschakeltimer-DP",
+          "countdown_values": "Uitschakeltimerwaarden"
+        },
+        "data_description": {
+          "speed_values": "Kommagetekend, van laag naar hoog. De PureFlow15 Pro gebruikt low, mid, high, turbo.",
+          "countdown_values": "Kommagetekend. De PureFlow15 Pro gebruikt cancel, 1h, 2h, 3h, 4h, 5h."
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Kan het apparaat niet lokaal bereiken. Controleer IP-adres, sleutel, protocolversie en of de app gesloten is.",
+      "power_not_boolean": "Het aan/uit-datapoint moet een boolean (true/false) zijn.",
+      "speed_values_invalid": "Vul minimaal twee snelheidswaarden in, van laag naar hoog.",
+      "countdown_values_invalid": "Vul minimaal twee uitschakeltimerwaarden in.",
+      "switch_not_boolean": "Dit datapoint moet een boolean (true/false) zijn.",
+      "invalid_local_key": "De lokale sleutel moet uit precies 16 tekens bestaan.",
+      "unknown": "Onverwachte fout. Bekijk de Home Assistant-logboeken."
+    },
+    "abort": {
+      "already_configured": "Dit apparaat is al geconfigureerd. Het IP-adres is bijgewerkt.",
+      "reconfigure_successful": "De lokale verbinding en datapointkoppelingen zijn bijgewerkt."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "pm25": {"name": "PM2.5"},
+      "voc": {"name": "VOC"},
+      "air_quality": {"name": "Luchtkwaliteit"},
+      "filter_life": {"name": "Filterlevensduur"}
+    },
+    "switch": {
+      "ionizer": {"name": "Ionisator"},
+      "child_lock": {"name": "Kinderslot"},
+      "display": {"name": "Display"}
+    },
+    "button": {
+      "filter_reset": {"name": "Filterlevensduur resetten"}
+    },
+    "select": {
+      "countdown": {
+        "name": "Uitschakeltimer",
+        "state": {
+          "cancel": "Uit",
+          "1h": "1 uur",
+          "2h": "2 uur",
+          "3h": "3 uur",
+          "4h": "4 uur",
+          "5h": "5 uur"
+        }
+      }
+    }
+  }
+}
