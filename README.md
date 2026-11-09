@@ -1,115 +1,149 @@
-# Vibrix PureFlow voor Home Assistant
+# Vibrix PureFlow for Home Assistant
 
-Deze custom integration bedient een Vibrix PureFlow15 rechtstreeks via het lokale netwerk. Nadat de lokale sleutel bekend is, gebruikt de integratie geen Tuya-cloud voor statusupdates of opdrachten.
+[English](README.md) | [Nederlands](README_NL.md)
 
-De PureFlow15 is een Tuya-OEM-apparaat. Met de standaardfirmware kan de Tuya-techniek daarom niet volledig worden verwijderd: de eerste activatie en het opvragen van de lokale sleutel lopen normaal gesproken eenmalig via Tuya. Daarna kun je internettoegang voor de luchtreiniger blokkeren, zolang Home Assistant hem op het LAN kan blijven bereiken.
+An unofficial Home Assistant custom integration for controlling a Vibrix PureFlow15 air purifier directly over the local network.
 
-## Ondersteunde Home Assistant-entiteiten
+After the local key has been obtained, status updates and commands are handled locally without using the Tuya cloud. The purifier must remain reachable from Home Assistant on the same LAN.
 
-- Luchtreiniger als `fan`, inclusief aan/uit, `low`, `mid`, `high`, `turbo` en auto-/slaapmodus.
-- PM2.5, VOC, luchtkwaliteit en resterende filterlevensduur als sensoren.
-- Ionisator, kinderslot en display als schakelaars.
-- Uitschakeltimer van één tot vijf uur en een knop om de filterlevensduur te resetten.
-- Configuratie volledig via de Home Assistant-interface.
-- Diagnostiek met actuele datapoints; IP-adres, device-ID en lokale sleutel worden geredigeerd.
+> [!IMPORTANT]
+> The PureFlow15 is a Tuya OEM device. With the original firmware, initial activation and retrieval of the local key normally require Tuya once. After setup, you can block the purifier's internet access while keeping local network traffic available.
 
-## Benodigd
+## Features
 
-- Home Assistant 2026.7 of nieuwer.
-- Een PureFlow15 die op hetzelfde lokale netwerk zit als Home Assistant.
-- Een vast of gereserveerd IP-adres voor de luchtreiniger.
-- Het Tuya `device_id`, de lokale sleutel van 16 tekens en protocolversie 3.1 t/m 3.5.
+- Local control through Home Assistant using the Tuya LAN protocol.
+- Power control and fan presets: `low`, `mid`, `high`, and `turbo`.
+- Automatic and sleep modes.
+- PM2.5, VOC, air-quality, and remaining filter-life sensors when supported by the device.
+- Ionizer, child-lock, and display switches.
+- One-to-five-hour shutdown timer.
+- Filter-life reset button.
+- Full configuration through the Home Assistant user interface.
+- Diagnostics with sensitive values such as the IP address, device ID, and local key redacted.
 
-TinyTuya documenteert de actuele procedure om de sleutel via de Tuya IoT-portal op te halen: <https://github.com/jasonacox/tinytuya#setup-wizard---getting-local-keys>. De netwerkscan toont het IP-adres, device-ID en de protocolversie:
+## Requirements
 
-```text
+- Home Assistant 2026.7 or newer.
+- A Vibrix PureFlow15 connected to the same local network as Home Assistant.
+- A fixed or DHCP-reserved IP address for the purifier.
+- The Tuya device ID.
+- The 16-character local key.
+- Tuya protocol version 3.1 through 3.5.
+
+## Obtaining the device details
+
+TinyTuya documents the current process for retrieving local keys through the Tuya IoT Platform: [TinyTuya setup wizard](https://github.com/jasonacox/tinytuya#setup-wizard---getting-local-keys).
+
+Install TinyTuya and run its scanner and wizard:
+
+```powershell
 python -m pip install tinytuya==1.20.0
 python -m tinytuya scan
 python -m tinytuya wizard
 ```
 
-Geeft de wizard op Windows `CERTIFICATE_VERIFY_FAILED`, laat Python dan de
-Windows-certificaatopslag gebruiken en start de wizard opnieuw:
+The scan reports the purifier's IP address, device ID, and protocol version. The wizard creates `devices.json`, which contains the local key.
 
-```text
+If the wizard returns `CERTIFICATE_VERIFY_FAILED` on Windows, install support for the Windows certificate store and retry:
+
+```powershell
 python -m pip install pip-system-certs
 python -m tinytuya wizard
 ```
 
-Bewaar `devices.json`, `tinytuya.json` en `tuya-raw.json` niet in Git: ze bevatten geheime sleutels en staan daarom in `.gitignore`.
+> [!WARNING]
+> Never publish `devices.json`, `tinytuya.json`, or `tuya-raw.json`. These files can contain account credentials and device keys. They are excluded by this repository's `.gitignore`.
 
-## Installatie
-
-### Handmatig
-
-1. Kopieer `custom_components/vibrix_pureflow` naar `/config/custom_components/vibrix_pureflow` op Home Assistant.
-2. Herstart Home Assistant.
-3. Ga naar **Instellingen → Apparaten & diensten → Integratie toevoegen**.
-4. Zoek naar **Vibrix PureFlow**.
+## Installation
 
 ### HACS custom repository
 
-1. Open **HACS** in de zijbalk van Home Assistant.
-2. Open rechtsboven het menu met de drie puntjes en kies **Custom repositories**.
-3. Voeg `https://github.com/Cindyst1/vibrix-pureflow-home-assistant` toe
-   als type **Integration**.
-4. Open **Vibrix PureFlow** in HACS en kies **Download**.
-5. Herstart Home Assistant.
-6. Ga naar **Instellingen → Apparaten & diensten → Integratie toevoegen** en
-   zoek naar **Vibrix PureFlow**.
+1. Open **HACS** in Home Assistant.
+2. Open the menu in the top-right corner and select **Custom repositories**.
+3. Add `https://github.com/Cindyst1/vibrix-pureflow-home-assistant`.
+4. Select **Integration** as the repository type.
+5. Open **Vibrix PureFlow** in HACS and select **Download**.
+6. Restart Home Assistant.
+7. Go to **Settings → Devices & services → Add integration**.
+8. Search for **Vibrix PureFlow**.
 
-## Datapoints bepalen
+### Manual installation
 
-Voor de geteste PureFlow15 Pro met protocol 3.5 zijn de datapoints:
+1. Copy `custom_components/vibrix_pureflow` to `/config/custom_components/vibrix_pureflow` on Home Assistant.
+2. Restart Home Assistant.
+3. Go to **Settings → Devices & services → Add integration**.
+4. Search for **Vibrix PureFlow**.
 
-| DP | Functie | Waarden |
+## Configuration
+
+During setup, enter:
+
+- A name for the purifier.
+- Its fixed IP address.
+- The Tuya device ID.
+- The 16-character local key.
+- The detected Tuya protocol version.
+
+Fully close the Tuya or Smart Life app before testing. Some devices accept only one active local connection at a time.
+
+The integration reads the available datapoints and then asks you to map the supported functions. Only select datapoints whose purpose you know.
+
+## Tested PureFlow15 Pro datapoints
+
+The tested PureFlow15 Pro using protocol 3.5 reports the following datapoints:
+
+| DP | Function | Values |
 | --- | --- | --- |
-| 1 | Aan/uit | `true`, `false` |
+| 1 | Power | `true`, `false` |
 | 2 | PM2.5 | 0–999 µg/m³ |
-| 3 | Modus/snelheid | `auto`, `sleep`, `low`, `mid`, `high`, `turbo` |
-| 5 | Filterlevensduur | 0–100% |
-| 6 | Ionisator | `true`, `false` |
-| 7 | Kinderslot | `true`, `false` |
+| 3 | Mode/speed | `auto`, `sleep`, `low`, `mid`, `high`, `turbo` |
+| 5 | Filter life | 0–100% |
+| 6 | Ionizer | `true`, `false` |
+| 7 | Child lock | `true`, `false` |
 | 8 | Display | `true`, `false` |
-| 11 | Filterreset | puls naar `true` |
-| 18 | Uitschakeltimer | `cancel`, `1h`, `2h`, `3h`, `4h`, `5h` |
+| 11 | Filter reset | Pulse to `true` |
+| 18 | Shutdown timer | `cancel`, `1h`, `2h`, `3h`, `4h`, `5h` |
 
-De configuratie vult dit profiel automatisch in wanneer deze datapoints worden
-gedetecteerd. Controleer de waarden bij andere hardware- of firmwarevarianten.
+This profile is filled automatically when these datapoints are detected. Datapoint numbers and values may differ between hardware or firmware versions.
 
-Tuya kent aan functies nummers toe die per hardware- of firmwarevariant kunnen verschillen. De configuratie toont alle datapoints die jouw apparaat rapporteert. Gebruik `tools/probe.py` om exact te bepalen welk nummer bij welke knop hoort:
+## Identifying unknown datapoints
 
-```text
-python tools/probe.py --ip 192.168.1.50 --id JOUW_DEVICE_ID --version 3.3
+Use `tools/probe.py` to compare datapoint changes while operating one function at a time on the purifier:
+
+```powershell
+python tools/probe.py --ip 192.168.1.50 --id YOUR_DEVICE_ID --version 3.5
 ```
 
-Na de TinyTuya-wizard kan de probe de sleutel rechtstreeks en zonder uitvoer
-uit `devices.json` lezen:
+After running the TinyTuya wizard, the probe can securely read the key from `devices.json` without printing it:
 
-```text
+```powershell
 python tools/probe.py --device-file devices.json --name PureFlow15Pro
 ```
 
-De lokale sleutel wordt veilig via een verborgen prompt gevraagd. Noteer eerst de beginsituatie, wijzig daarna telkens precies één functie op het fysieke bedieningspaneel en druk op Enter. De probe toont alleen de gewijzigde datapoints.
+Record the initial state, change exactly one function on the physical control panel, and press Enter. The probe displays only the datapoints that changed.
 
-Voorbeeld van mogelijke snelheidswaarden:
+Do not map unknown switch datapoints. An incorrect sensor mapping produces confusing readings, while an incorrect switch mapping may operate a different device function.
 
-```text
-level_1, level_2, level_3, level_4
-```
+## Local-only operation
 
-Of, wanneer het apparaat getallen gebruikt:
+Once local control works reliably, you can block internet access for the purifier in your router. Keep traffic between Home Assistant and the purifier allowed on the local network, including TCP port 6668.
 
-```text
-1, 2, 3, 4
-```
+Reserve the purifier's IP address in your router so the integration can always find it. After a factory reset or re-pairing, the local key may change. Use **Reconfigure** on the integration to enter the new connection details.
 
-Selecteer onbekende datapoints niet. Een verkeerde sensorselectie is vooral verwarrend; een verkeerd schakel-datapoint kan een andere apparaatfunctie bedienen.
+## Troubleshooting
 
-## Na de configuratie
+- **Cannot connect:** verify the IP address, device ID, local key, and protocol version.
+- **Device becomes unavailable:** close the Tuya/Smart Life app and check that Home Assistant can reach the purifier on the LAN.
+- **Connection stops after an IP change:** create a DHCP reservation and reconfigure the integration with the current address.
+- **Authentication fails after re-pairing:** retrieve the new local key and reconfigure the integration.
+- **A function operates incorrectly:** verify its datapoint using `tools/probe.py` and update the mapping.
 
-Als lokale bediening betrouwbaar werkt, kun je in je router internettoegang voor de luchtreiniger blokkeren. Laat verkeer tussen Home Assistant en het apparaat op het lokale netwerk toe, waaronder TCP-poort 6668. Na een fabrieksreset of opnieuw koppelen verandert de lokale sleutel; gebruik dan **Herconfigureren** bij de integratie om de nieuwe sleutel in te voeren.
+## Tuya limitation
 
-## Beperking zonder Tuya
+Running the original firmware without ever using a Tuya app or account is generally not possible. The device must first be activated, and its local key is required for encrypted LAN communication.
 
-Volledig zonder ooit een Tuya-app of -account te gebruiken is met de standaardfirmware waarschijnlijk niet mogelijk: Tuya-apparaten moeten eerst worden geactiveerd en de lokale sleutel is nodig voor versleutelde LAN-communicatie. De enige echte Tuya-vrije route is alternatieve firmware op de wifi-module, waarvoor het exacte module- en printplaattype onderzocht moet worden en waarbij schade of verlies van garantie mogelijk is.
+The only fully Tuya-free route would be compatible alternative firmware for the exact Wi-Fi module and circuit board revision. This requires hardware investigation and may damage the device or void its warranty.
+
+## Support
+
+Found a problem or have a different PureFlow datapoint profile? [Open an issue](https://github.com/Cindyst1/vibrix-pureflow-home-assistant/issues) and include the Home Assistant version, integration version, protocol version, and redacted diagnostics. Never include your local key.
